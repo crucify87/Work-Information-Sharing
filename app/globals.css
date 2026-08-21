@@ -1,0 +1,54 @@
+@import "tailwindcss";
+
+:root {
+  --background: #f6f7f4;
+  --foreground: #1c201c;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+.metric-icon {
+  display: inline-flex;
+  height: 2.5rem;
+  width: 2.5rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.5rem;
+}
+
+.metric-icon.emerald {
+  background: #e8f6ee;
+  color: #217346;
+}
+
+.metric-icon.blue {
+  background: #eaf2ff;
+  color: #245ea8;
+}
+
+.metric-icon.amber {
+  background: #fff5dd;
+  color: #a76505;
+}
+
+.metric-icon.rose {
+  background: #fff0f1;
+  color: #b33c55;
+}
