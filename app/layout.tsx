@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "업무공유 허브",
-  description: "생산, 물류, 재고, 회계 부서가 함께 쓰는 통합 업무공유 앱입니다.",
+  title: "123푸드 업무공유",
+  description: "123푸드 생산, 물류, 재고, 회계 부서가 함께 쓰는 업무공유 앱입니다.",
   icons: {
     icon: "/favicon.svg",
     shortcut: "/favicon.svg",
