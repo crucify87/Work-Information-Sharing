@@ -1,6 +1,5 @@
 import {
   ArrowRight,
-  Boxes,
   Building2,
   Calculator,
   CheckCircle2,
@@ -114,12 +113,6 @@ const handoffs = [
   },
 ];
 
-const inventoryAlerts = [
-  { item: "A-104 원자재", stock: "2.1일분", note: "발주 승인 필요" },
-  { item: "B-018 포장재", stock: "3.4일분", note: "금일 입고 예정" },
-  { item: "C-771 완제품", stock: "과잉 18%", note: "출고 계획 조정" },
-];
-
 export default function Home() {
   return (
     <main className="min-h-screen bg-[#f6f7f4] text-[#1c201c]">
@@ -194,29 +187,6 @@ export default function Home() {
                     <span className="ml-auto font-medium">{handoff.time}</span>
                   </div>
                   <p className="text-sm font-semibold">{handoff.title}</p>
-                </article>
-              ))}
-            </div>
-          </section>
-
-          <section className="rounded-lg border border-[#d9ded4] bg-white p-4 shadow-sm">
-            <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-lg font-semibold">재고 알림</h2>
-              <Boxes className="h-4 w-4 text-[#687266]" aria-hidden="true" />
-            </div>
-            <div className="space-y-3">
-              {inventoryAlerts.map((alert) => (
-                <article
-                  className="grid grid-cols-[1fr_auto] gap-2 border-b border-[#e8ece5] pb-3 last:border-0 last:pb-0"
-                  key={alert.item}
-                >
-                  <div>
-                    <p className="text-sm font-semibold">{alert.item}</p>
-                    <p className="mt-1 text-xs text-[#687266]">{alert.note}</p>
-                  </div>
-                  <span className="text-sm font-bold text-[#b44923]">
-                    {alert.stock}
-                  </span>
                 </article>
               ))}
             </div>
