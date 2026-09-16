@@ -72,6 +72,11 @@ function formatDateLabel(dateValue: string) {
   return `${Number(month)}/${Number(day)}`;
 }
 
+function formatLongDate(dateValue: string) {
+  const [year, month, day] = dateValue.split("-");
+  return `${year}년 ${Number(month)}월 ${Number(day)}일`;
+}
+
 function getItemDate(item: Pick<WorkItem, "date">) {
   return isDateValue(item.date) ? item.date : todayDateValue();
 }
@@ -124,10 +129,14 @@ function MonthlyCalendar({
   items,
   month,
   onMonthChange,
+  selectedDate,
+  onSelectDate,
 }: {
   items: WorkItem[];
   month: string;
   onMonthChange: (month: string) => void;
+  selectedDate: string;
+  onSelectDate: (date: string) => void;
 }) {
   const calendarDays = useMemo(() => buildCalendarDays(month), [month]);
   const itemsByDate = useMemo(() => {
@@ -144,6 +153,7 @@ function MonthlyCalendar({
       count: items.filter((item) => item.department === department).length,
     }));
   }, [items]);
+  const selectedItems = itemsByDate[selectedDate] ?? [];
 
   return (
     <section className="rounded-lg border border-[#d9ded4] bg-white shadow-sm">
@@ -195,57 +205,118 @@ function MonthlyCalendar({
       </div>
 
       <div className="p-3">
-        <div className="grid grid-cols-7 gap-1 text-center text-xs font-bold text-[#687266]">
-          {weekdayLabels.map((weekday) => (
-            <div className="py-2" key={weekday}>
-              {weekday}
+        <div className="overflow-x-auto pb-2">
+          <div className="min-w-[820px] md:min-w-0">
+            <div className="grid grid-cols-7 gap-1 text-center text-sm font-bold text-[#687266]">
+              {weekdayLabels.map((weekday) => (
+                <div className="py-2" key={weekday}>
+                  {weekday}
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
-        <div className="grid grid-cols-7 gap-1">
-          {calendarDays.map((day) => {
-            const dayItems = itemsByDate[day.value] ?? [];
+            <div className="grid grid-cols-7 gap-1">
+              {calendarDays.map((day) => {
+                const dayItems = itemsByDate[day.value] ?? [];
+                const isSelected = selectedDate === day.value;
 
-            return (
-              <div
-                className={`min-h-24 rounded-md border p-1.5 sm:min-h-28 ${
-                  day.isCurrentMonth
-                    ? "border-[#e1e6dc] bg-[#fbfcf8]"
-                    : "border-[#eef1eb] bg-[#f6f7f4] text-[#9aa397]"
-                }`}
-                key={day.value}
-              >
-                <div
-                  className={`mb-1 inline-flex h-6 min-w-6 items-center justify-center rounded-full px-1.5 text-xs font-bold ${
-                    day.isToday ? "bg-[#22362b] text-white" : ""
-                  }`}
-                >
-                  {day.day}
-                </div>
-                <div className="space-y-1">
-                  {dayItems.slice(0, 3).map((item) => (
-                    <div
-                      className={`rounded-md px-1.5 py-1 text-left ring-1 ${departmentStyles[item.department]}`}
-                      key={item.id}
-                      title={`${item.department} - ${item.title}`}
-                    >
-                      <p className="truncate text-[10px] font-bold leading-4">
-                        {item.department}
-                      </p>
-                      <p className="truncate text-[11px] font-semibold leading-4">
-                        {item.title}
-                      </p>
+                return (
+                  <button
+                    aria-label={`${formatLongDate(day.value)} 업무 ${dayItems.length}건 보기`}
+                    aria-pressed={isSelected}
+                    className={`min-h-32 rounded-md border p-2 text-left transition focus:outline-none focus:ring-2 focus:ring-[#22362b] sm:min-h-36 ${
+                      day.isCurrentMonth
+                        ? "border-[#e1e6dc] bg-[#fbfcf8] hover:bg-white"
+                        : "border-[#eef1eb] bg-[#f6f7f4] text-[#9aa397]"
+                    } ${isSelected ? "border-[#22362b] ring-2 ring-[#c7d6c4]" : ""}`}
+                    key={day.value}
+                    onClick={() => onSelectDate(day.value)}
+                    type="button"
+                  >
+                    <div className="mb-1 flex items-center justify-between gap-2">
+                      <span
+                        className={`inline-flex h-7 min-w-7 items-center justify-center rounded-full px-2 text-sm font-bold ${
+                          day.isToday ? "bg-[#22362b] text-white" : ""
+                        }`}
+                      >
+                        {day.day}
+                      </span>
+                      {dayItems.length > 0 && (
+                        <span className="rounded-full bg-[#22362b] px-2 py-0.5 text-xs font-bold text-white">
+                          {dayItems.length}
+                        </span>
+                      )}
                     </div>
-                  ))}
-                  {dayItems.length > 3 && (
-                    <p className="text-[10px] font-bold text-[#687266]">
-                      +{dayItems.length - 3}건
-                    </p>
-                  )}
-                </div>
-              </div>
-            );
-          })}
+                    <div className="space-y-1">
+                      {dayItems.slice(0, 3).map((item) => (
+                        <div
+                          className={`rounded-md px-2 py-1 text-left ring-1 ${departmentStyles[item.department]}`}
+                          key={item.id}
+                          title={`${item.department} - ${item.title}`}
+                        >
+                          <p className="truncate text-xs font-bold leading-4">
+                            {item.department}
+                          </p>
+                          <p className="truncate text-xs font-semibold leading-5">
+                            {item.title}
+                          </p>
+                        </div>
+                      ))}
+                      {dayItems.length > 3 && (
+                        <p className="text-xs font-bold text-[#687266]">
+                          +{dayItems.length - 3}건 더 보기
+                        </p>
+                      )}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-3 rounded-lg border border-[#e1e6dc] bg-[#fbfcf8] p-3">
+          <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+            <h3 className="text-base font-semibold">
+              {formatLongDate(selectedDate)} 등록 내역
+            </h3>
+            <span className="text-sm font-bold text-[#687266]">
+              총 {selectedItems.length}건
+            </span>
+          </div>
+
+          {selectedItems.length > 0 ? (
+            <div className="mt-3 grid gap-2">
+              {selectedItems.map((item) => (
+                <article
+                  className="rounded-md border border-[#e1e6dc] bg-white p-3"
+                  key={item.id}
+                >
+                  <div className="mb-2 flex flex-wrap items-center gap-2">
+                    <span
+                      className={`rounded-full px-2.5 py-1 text-xs font-bold ring-1 ${departmentStyles[item.department]}`}
+                    >
+                      {item.department}
+                    </span>
+                    <span
+                      className={`rounded-full px-2.5 py-1 text-xs font-bold ring-1 ${statusStyles[item.status]}`}
+                    >
+                      {item.status}
+                    </span>
+                    <span className="ml-auto text-sm font-semibold text-[#687266]">
+                      {item.owner}
+                    </span>
+                  </div>
+                  <p className="text-sm font-semibold text-[#141914]">
+                    {item.title}
+                  </p>
+                </article>
+              ))}
+            </div>
+          ) : (
+            <p className="mt-3 rounded-md bg-white p-4 text-sm font-medium text-[#687266]">
+              이 날짜에 등록된 업무가 없습니다.
+            </p>
+          )}
         </div>
       </div>
     </section>
@@ -259,6 +330,7 @@ export function WorkBoard({ initialItems }: { initialItems: WorkItem[] }) {
   const [calendarMonth, setCalendarMonth] = useState(() =>
     todayDateValue().slice(0, 7),
   );
+  const [selectedDate, setSelectedDate] = useState(() => todayDateValue());
   const [isReady, setIsReady] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editDraft, setEditDraft] = useState<WorkItem | null>(null);
@@ -364,6 +436,8 @@ export function WorkBoard({ initialItems }: { initialItems: WorkItem[] }) {
         items={items}
         month={calendarMonth}
         onMonthChange={setCalendarMonth}
+        selectedDate={selectedDate}
+        onSelectDate={setSelectedDate}
       />
 
       <div className="rounded-lg border border-[#d9ded4] bg-white shadow-sm">
