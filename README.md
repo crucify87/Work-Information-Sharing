@@ -1,6 +1,6 @@
-# 123푸드 업무공유
+# work-information-sharing
 
-123푸드 생산, 물류, 재고, 회계 부서가 같은 화면에서 업무 흐름을 공유하는 웹앱입니다.
+생산, 물류, 재고, 회계 부서가 같은 화면에서 업무 흐름을 공유하는 웹앱입니다.
 
 배포 주소: https://business-work-hub.workspace-910868.chatgpt.site
 

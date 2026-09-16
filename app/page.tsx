@@ -121,13 +121,13 @@ export default function Home() {
           <div className="flex flex-col gap-3">
             <div className="flex items-center gap-2 text-sm font-semibold text-[#687266]">
               <Building2 className="h-4 w-4" aria-hidden="true" />
-              123푸드 업무공유
+              work-information-sharing
             </div>
             <h1 className="max-w-3xl text-3xl font-semibold tracking-normal text-[#111611] sm:text-4xl">
-              생산, 물류, 재고, 회계가 오늘의 업무 흐름을 함께 맞춥니다
+              work-information-sharing
             </h1>
             <p className="max-w-2xl text-sm font-medium text-[#687266] sm:text-base">
-              123푸드의 부서별 업무, 인계, 재고 경보, 정산 확인 사항을 한 곳에 모아
+              부서별 업무, 인계, 재고 경보, 정산 확인 사항을 한 곳에 모아
               마감 전에 놓치는 일을 줄입니다.
             </p>
           </div>
