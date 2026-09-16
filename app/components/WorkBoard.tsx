@@ -2,6 +2,9 @@
 
 import {
   AlertTriangle,
+  CalendarDays,
+  ChevronLeft,
+  ChevronRight,
   Clock3,
   Edit3,
   Plus,
@@ -21,6 +24,7 @@ export type WorkItem = {
   title: string;
   department: Exclude<Department, "전체">;
   owner: string;
+  date?: string;
   due: string;
   status: Status;
   priority: Priority;
@@ -29,6 +33,7 @@ export type WorkItem = {
 const STORAGE_KEY = "business-work-hub-items";
 
 const departments: Department[] = ["전체", "생산", "물류", "재고", "회계"];
+const workDepartments: WorkItem["department"][] = ["생산", "물류", "재고", "회계"];
 const statuses: Status[] = ["진행중", "확인필요", "완료"];
 const priorities: Priority[] = ["긴급", "보통", "낮음"];
 
@@ -37,6 +42,70 @@ const statusStyles: Record<Status, string> = {
   확인필요: "bg-amber-50 text-amber-800 ring-amber-200",
   완료: "bg-emerald-50 text-emerald-700 ring-emerald-200",
 };
+
+const departmentStyles: Record<Exclude<Department, "전체">, string> = {
+  생산: "bg-emerald-50 text-emerald-800 ring-emerald-200",
+  물류: "bg-sky-50 text-sky-800 ring-sky-200",
+  재고: "bg-amber-50 text-amber-800 ring-amber-200",
+  회계: "bg-rose-50 text-rose-800 ring-rose-200",
+};
+
+const weekdayLabels = ["일", "월", "화", "수", "목", "금", "토"];
+
+function toDateInputValue(date: Date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function todayDateValue() {
+  return toDateInputValue(new Date());
+}
+
+function isDateValue(value: unknown): value is string {
+  return typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value);
+}
+
+function formatDateLabel(dateValue: string) {
+  const [, month, day] = dateValue.split("-");
+  return `${Number(month)}/${Number(day)}`;
+}
+
+function getItemDate(item: Pick<WorkItem, "date">) {
+  return isDateValue(item.date) ? item.date : todayDateValue();
+}
+
+function shiftMonth(monthValue: string, offset: number) {
+  const [year, month] = monthValue.split("-").map(Number);
+  const date = new Date(year, month - 1 + offset, 1);
+  return toDateInputValue(date).slice(0, 7);
+}
+
+function getMonthLabel(monthValue: string) {
+  const [year, month] = monthValue.split("-");
+  return `${year}년 ${Number(month)}월`;
+}
+
+function buildCalendarDays(monthValue: string) {
+  const [year, month] = monthValue.split("-").map(Number);
+  const firstDay = new Date(year, month - 1, 1);
+  const startDay = new Date(firstDay);
+  startDay.setDate(firstDay.getDate() - firstDay.getDay());
+
+  return Array.from({ length: 42 }, (_, index) => {
+    const date = new Date(startDay);
+    date.setDate(startDay.getDate() + index);
+    const value = toDateInputValue(date);
+
+    return {
+      value,
+      day: date.getDate(),
+      isCurrentMonth: value.startsWith(monthValue),
+      isToday: value === todayDateValue(),
+    };
+  });
+}
 
 function readSavedItems(fallback: WorkItem[]) {
   try {
@@ -51,13 +120,149 @@ function readSavedItems(fallback: WorkItem[]) {
   }
 }
 
+function MonthlyCalendar({
+  items,
+  month,
+  onMonthChange,
+}: {
+  items: WorkItem[];
+  month: string;
+  onMonthChange: (month: string) => void;
+}) {
+  const calendarDays = useMemo(() => buildCalendarDays(month), [month]);
+  const itemsByDate = useMemo(() => {
+    return items.reduce<Record<string, WorkItem[]>>((groups, item) => {
+      const date = getItemDate(item);
+      groups[date] = groups[date] ? [...groups[date], item] : [item];
+      return groups;
+    }, {});
+  }, [items]);
+
+  const departmentCounts = useMemo(() => {
+    return workDepartments.map((department) => ({
+      department,
+      count: items.filter((item) => item.department === department).length,
+    }));
+  }, [items]);
+
+  return (
+    <section className="rounded-lg border border-[#d9ded4] bg-white shadow-sm">
+      <div className="flex flex-col gap-3 border-b border-[#e5e9e0] p-4 md:flex-row md:items-center md:justify-between">
+        <div>
+          <div className="flex items-center gap-2 text-sm font-semibold text-[#687266]">
+            <CalendarDays className="h-4 w-4" aria-hidden="true" />
+            월간 업무 대시보드
+          </div>
+          <h2 className="mt-1 text-lg font-semibold">{getMonthLabel(month)}</h2>
+        </div>
+        <div className="flex items-center gap-2">
+          <button
+            aria-label="이전 달"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-md bg-[#eef1eb] text-[#4d574c] transition hover:bg-[#e0e5dc]"
+            onClick={() => onMonthChange(shiftMonth(month, -1))}
+            type="button"
+          >
+            <ChevronLeft className="h-4 w-4" aria-hidden="true" />
+          </button>
+          <button
+            className="h-9 rounded-md bg-[#22362b] px-3 text-xs font-bold text-white transition hover:bg-[#314c3d]"
+            onClick={() => onMonthChange(todayDateValue().slice(0, 7))}
+            type="button"
+          >
+            이번 달
+          </button>
+          <button
+            aria-label="다음 달"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-md bg-[#eef1eb] text-[#4d574c] transition hover:bg-[#e0e5dc]"
+            onClick={() => onMonthChange(shiftMonth(month, 1))}
+            type="button"
+          >
+            <ChevronRight className="h-4 w-4" aria-hidden="true" />
+          </button>
+        </div>
+      </div>
+
+      <div className="flex flex-wrap gap-2 border-b border-[#e5e9e0] px-4 py-3">
+        {departmentCounts.map(({ department, count }) => (
+          <span
+            className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-bold ring-1 ${departmentStyles[department]}`}
+            key={department}
+          >
+            {department}
+            <span className="font-semibold">{count}</span>
+          </span>
+        ))}
+      </div>
+
+      <div className="p-3">
+        <div className="grid grid-cols-7 gap-1 text-center text-xs font-bold text-[#687266]">
+          {weekdayLabels.map((weekday) => (
+            <div className="py-2" key={weekday}>
+              {weekday}
+            </div>
+          ))}
+        </div>
+        <div className="grid grid-cols-7 gap-1">
+          {calendarDays.map((day) => {
+            const dayItems = itemsByDate[day.value] ?? [];
+
+            return (
+              <div
+                className={`min-h-24 rounded-md border p-1.5 sm:min-h-28 ${
+                  day.isCurrentMonth
+                    ? "border-[#e1e6dc] bg-[#fbfcf8]"
+                    : "border-[#eef1eb] bg-[#f6f7f4] text-[#9aa397]"
+                }`}
+                key={day.value}
+              >
+                <div
+                  className={`mb-1 inline-flex h-6 min-w-6 items-center justify-center rounded-full px-1.5 text-xs font-bold ${
+                    day.isToday ? "bg-[#22362b] text-white" : ""
+                  }`}
+                >
+                  {day.day}
+                </div>
+                <div className="space-y-1">
+                  {dayItems.slice(0, 3).map((item) => (
+                    <div
+                      className={`rounded-md px-1.5 py-1 text-left ring-1 ${departmentStyles[item.department]}`}
+                      key={item.id}
+                      title={`${item.department} - ${item.title}`}
+                    >
+                      <p className="truncate text-[10px] font-bold leading-4">
+                        {item.department}
+                      </p>
+                      <p className="truncate text-[11px] font-semibold leading-4">
+                        {item.title}
+                      </p>
+                    </div>
+                  ))}
+                  {dayItems.length > 3 && (
+                    <p className="text-[10px] font-bold text-[#687266]">
+                      +{dayItems.length - 3}건
+                    </p>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export function WorkBoard({ initialItems }: { initialItems: WorkItem[] }) {
   const [activeDepartment, setActiveDepartment] = useState<Department>("전체");
   const [query, setQuery] = useState("");
   const [items, setItems] = useState(initialItems);
+  const [calendarMonth, setCalendarMonth] = useState(() =>
+    todayDateValue().slice(0, 7),
+  );
   const [isReady, setIsReady] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editDraft, setEditDraft] = useState<WorkItem | null>(null);
+  const defaultDueDate = todayDateValue();
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
@@ -95,7 +300,8 @@ export function WorkBoard({ initialItems }: { initialItems: WorkItem[] }) {
       form.get("department") || "생산",
     ) as WorkItem["department"];
     const owner = String(form.get("owner") || "").trim() || "담당자";
-    const due = String(form.get("due") || "").trim() || "오늘";
+    const date = String(form.get("date") || defaultDueDate);
+    const due = formatDateLabel(date);
     const status = String(form.get("status") || "진행중") as Status;
 
     if (!title) {
@@ -108,6 +314,7 @@ export function WorkBoard({ initialItems }: { initialItems: WorkItem[] }) {
         title,
         department,
         owner,
+        date,
         due,
         status,
         priority: "보통",
@@ -135,7 +342,8 @@ export function WorkBoard({ initialItems }: { initialItems: WorkItem[] }) {
       ...editDraft,
       title: editDraft.title.trim(),
       owner: editDraft.owner.trim() || "담당자",
-      due: editDraft.due.trim() || "오늘",
+      date: getItemDate(editDraft),
+      due: formatDateLabel(getItemDate(editDraft)),
     };
 
     setItems((current) =>
@@ -152,6 +360,12 @@ export function WorkBoard({ initialItems }: { initialItems: WorkItem[] }) {
 
   return (
     <>
+      <MonthlyCalendar
+        items={items}
+        month={calendarMonth}
+        onMonthChange={setCalendarMonth}
+      />
+
       <div className="rounded-lg border border-[#d9ded4] bg-white shadow-sm">
         <div className="flex flex-col gap-4 border-b border-[#e5e9e0] p-4">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -218,7 +432,7 @@ export function WorkBoard({ initialItems }: { initialItems: WorkItem[] }) {
                       }
                       value={editDraft.department}
                     >
-                      {departments.slice(1).map((department) => (
+                      {workDepartments.map((department) => (
                         <option key={department}>{department}</option>
                       ))}
                     </select>
@@ -264,8 +478,13 @@ export function WorkBoard({ initialItems }: { initialItems: WorkItem[] }) {
                   <input
                     aria-label="마감 수정"
                     className="h-9 min-w-0 rounded-md border border-[#d5dbd0] px-2 outline-none focus:border-[#22362b] focus:ring-2 focus:ring-[#c7d6c4]"
-                    onChange={(event) => updateDraft("due", event.target.value)}
-                    value={editDraft.due}
+                    onChange={(event) => {
+                      const nextDate = event.target.value || todayDateValue();
+                      updateDraft("date", nextDate);
+                      updateDraft("due", formatDateLabel(nextDate));
+                    }}
+                    type="date"
+                    value={getItemDate(editDraft)}
                   />
                 ) : (
                   item.due
@@ -351,7 +570,7 @@ export function WorkBoard({ initialItems }: { initialItems: WorkItem[] }) {
       </div>
 
       <form
-        className="grid gap-3 rounded-lg border border-[#d9ded4] bg-white p-4 shadow-sm sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-[minmax(220px,1fr)_110px_110px_110px_110px_80px]"
+        className="grid gap-3 rounded-lg border border-[#d9ded4] bg-white p-4 shadow-sm sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-[minmax(220px,1fr)_110px_110px_130px_110px_86px]"
         onSubmit={addWorkItem}
       >
         <label className="grid min-w-0 gap-1 text-sm font-semibold text-[#4d574c]">
@@ -368,7 +587,7 @@ export function WorkBoard({ initialItems }: { initialItems: WorkItem[] }) {
             className="h-10 w-full rounded-md border border-[#d5dbd0] px-3 font-normal outline-none focus:border-[#22362b] focus:ring-2 focus:ring-[#c7d6c4]"
             name="department"
           >
-            {departments.slice(1).map((department) => (
+            {workDepartments.map((department) => (
               <option key={department}>{department}</option>
             ))}
           </select>
@@ -385,8 +604,9 @@ export function WorkBoard({ initialItems }: { initialItems: WorkItem[] }) {
           마감
           <input
             className="h-10 w-full rounded-md border border-[#d5dbd0] px-3 font-normal outline-none focus:border-[#22362b] focus:ring-2 focus:ring-[#c7d6c4]"
-            name="due"
-            placeholder="오늘"
+            defaultValue={defaultDueDate}
+            name="date"
+            type="date"
           />
         </label>
         <label className="grid min-w-0 gap-1 text-sm font-semibold text-[#4d574c]">
@@ -401,11 +621,11 @@ export function WorkBoard({ initialItems }: { initialItems: WorkItem[] }) {
           </select>
         </label>
         <button
-          className="mt-auto inline-flex h-10 w-full items-center justify-center gap-2 rounded-md bg-[#22362b] px-4 text-sm font-bold text-white transition hover:bg-[#314c3d] 2xl:w-auto"
+          className="mt-auto inline-flex h-10 w-full items-center justify-center gap-1.5 rounded-md bg-[#22362b] px-3 text-xs font-bold text-white transition hover:bg-[#314c3d] 2xl:w-auto"
           type="submit"
         >
           <Plus className="h-4 w-4" aria-hidden="true" />
-          등록
+          <span className="whitespace-nowrap">등록</span>
         </button>
       </form>
     </>
