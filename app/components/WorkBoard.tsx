@@ -97,7 +97,6 @@ export function WorkBoard({ initialItems }: { initialItems: WorkItem[] }) {
     const owner = String(form.get("owner") || "").trim() || "담당자";
     const due = String(form.get("due") || "").trim() || "오늘";
     const status = String(form.get("status") || "진행중") as Status;
-    const priority = String(form.get("priority") || "보통") as Priority;
 
     if (!title) {
       return;
@@ -111,7 +110,7 @@ export function WorkBoard({ initialItems }: { initialItems: WorkItem[] }) {
         owner,
         due,
         status,
-        priority,
+        priority: "보통",
       },
       ...current,
     ]);
@@ -352,7 +351,7 @@ export function WorkBoard({ initialItems }: { initialItems: WorkItem[] }) {
       </div>
 
       <form
-        className="grid gap-3 rounded-lg border border-[#d9ded4] bg-white p-4 shadow-sm sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-[minmax(220px,1fr)_110px_110px_110px_110px_110px_80px]"
+        className="grid gap-3 rounded-lg border border-[#d9ded4] bg-white p-4 shadow-sm sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-[minmax(220px,1fr)_110px_110px_110px_110px_80px]"
         onSubmit={addWorkItem}
       >
         <label className="grid min-w-0 gap-1 text-sm font-semibold text-[#4d574c]">
@@ -398,18 +397,6 @@ export function WorkBoard({ initialItems }: { initialItems: WorkItem[] }) {
           >
             {statuses.map((status) => (
               <option key={status}>{status}</option>
-            ))}
-          </select>
-        </label>
-        <label className="grid min-w-0 gap-1 text-sm font-semibold text-[#4d574c]">
-          우선순위
-          <select
-            className="h-10 w-full rounded-md border border-[#d5dbd0] px-3 font-normal outline-none focus:border-[#22362b] focus:ring-2 focus:ring-[#c7d6c4]"
-            name="priority"
-            defaultValue="보통"
-          >
-            {priorities.map((priority) => (
-              <option key={priority}>{priority}</option>
             ))}
           </select>
         </label>
