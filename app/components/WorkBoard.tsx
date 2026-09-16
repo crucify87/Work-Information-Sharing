@@ -7,7 +7,6 @@ import {
   ChevronRight,
   Clock3,
   Edit3,
-  Plus,
   Search,
   Save,
   Trash2,
@@ -498,7 +497,7 @@ export function WorkBoard({ initialItems }: { initialItems: WorkItem[] }) {
 
             return (
             <article
-              className="grid gap-3 p-4 transition hover:bg-[#fbfcf8] md:grid-cols-[1fr_150px_130px_110px_110px]"
+              className="grid gap-3 p-4 transition hover:bg-[#fbfcf8] md:grid-cols-[1fr_150px_130px_110px_144px]"
               key={item.id}
             >
               <div>
@@ -633,21 +632,21 @@ export function WorkBoard({ initialItems }: { initialItems: WorkItem[] }) {
                   <>
                     <button
                       aria-label={`${item.title} 수정`}
-                      className="inline-flex h-9 items-center justify-center gap-2 rounded-md bg-[#eef1eb] px-3 text-sm font-bold text-[#4d574c] transition hover:bg-[#e0e5dc]"
+                      className="inline-flex h-9 min-w-14 items-center justify-center gap-1 rounded-md bg-[#eef1eb] px-2 text-xs font-bold leading-none text-[#4d574c] transition hover:bg-[#e0e5dc]"
                       onClick={() => startEdit(item)}
                       type="button"
                     >
-                      <Edit3 className="h-4 w-4" aria-hidden="true" />
-                      수정
+                      <Edit3 className="h-3.5 w-3.5" aria-hidden="true" />
+                      <span className="whitespace-nowrap break-keep">수정</span>
                     </button>
                     <button
                       aria-label={`${item.title} 삭제`}
-                      className="inline-flex h-9 items-center justify-center gap-2 rounded-md bg-[#fff2eb] px-3 text-sm font-bold text-[#b44923] transition hover:bg-[#ffe5d8]"
+                      className="inline-flex h-9 min-w-14 items-center justify-center gap-1 rounded-md bg-[#fff2eb] px-2 text-xs font-bold leading-none text-[#b44923] transition hover:bg-[#ffe5d8]"
                       onClick={() => deleteWorkItem(item.id)}
                       type="button"
                     >
-                      <Trash2 className="h-4 w-4" aria-hidden="true" />
-                      삭제
+                      <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
+                      <span className="whitespace-nowrap break-keep">삭제</span>
                     </button>
                   </>
                 )}
@@ -664,7 +663,7 @@ export function WorkBoard({ initialItems }: { initialItems: WorkItem[] }) {
       </div>
 
       <form
-        className="grid gap-3 rounded-lg border border-[#d9ded4] bg-white p-4 shadow-sm sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-[minmax(220px,1fr)_110px_110px_130px_110px_86px]"
+        className="grid gap-3 rounded-lg border border-[#d9ded4] bg-white p-4 shadow-sm sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-[minmax(220px,1fr)_110px_110px_130px_110px_72px]"
         onSubmit={addWorkItem}
       >
         <label className="grid min-w-0 gap-1 text-sm font-semibold text-[#4d574c]">
@@ -715,11 +714,10 @@ export function WorkBoard({ initialItems }: { initialItems: WorkItem[] }) {
           </select>
         </label>
         <button
-          className="mt-auto inline-flex h-10 w-full items-center justify-center gap-1.5 rounded-md bg-[#22362b] px-3 text-xs font-bold text-white transition hover:bg-[#314c3d] 2xl:w-auto"
+          className="mt-auto inline-flex h-10 w-full items-center justify-center rounded-md bg-[#22362b] px-3 text-sm font-bold leading-none text-white transition hover:bg-[#314c3d] 2xl:w-auto"
           type="submit"
         >
-          <Plus className="h-4 w-4" aria-hidden="true" />
-          <span className="whitespace-nowrap">등록</span>
+          <span className="whitespace-nowrap break-keep">등록</span>
         </button>
       </form>
     </>
