@@ -10,6 +10,7 @@ import {
   Plus,
   Search,
   Save,
+  Trash2,
   Users,
   X,
 } from "lucide-react";
@@ -430,6 +431,14 @@ export function WorkBoard({ initialItems }: { initialItems: WorkItem[] }) {
     setEditDraft(null);
   }
 
+  function deleteWorkItem(id: number) {
+    setItems((current) => current.filter((item) => item.id !== id));
+    if (editingId === id) {
+      setEditingId(null);
+      setEditDraft(null);
+    }
+  }
+
   return (
     <>
       <MonthlyCalendar
@@ -621,15 +630,26 @@ export function WorkBoard({ initialItems }: { initialItems: WorkItem[] }) {
                     </button>
                   </>
                 ) : (
-                  <button
-                    aria-label={`${item.title} 수정`}
-                    className="inline-flex h-9 items-center justify-center gap-2 rounded-md bg-[#eef1eb] px-3 text-sm font-bold text-[#4d574c] transition hover:bg-[#e0e5dc]"
-                    onClick={() => startEdit(item)}
-                    type="button"
-                  >
-                    <Edit3 className="h-4 w-4" aria-hidden="true" />
-                    수정
-                  </button>
+                  <>
+                    <button
+                      aria-label={`${item.title} 수정`}
+                      className="inline-flex h-9 items-center justify-center gap-2 rounded-md bg-[#eef1eb] px-3 text-sm font-bold text-[#4d574c] transition hover:bg-[#e0e5dc]"
+                      onClick={() => startEdit(item)}
+                      type="button"
+                    >
+                      <Edit3 className="h-4 w-4" aria-hidden="true" />
+                      수정
+                    </button>
+                    <button
+                      aria-label={`${item.title} 삭제`}
+                      className="inline-flex h-9 items-center justify-center gap-2 rounded-md bg-[#fff2eb] px-3 text-sm font-bold text-[#b44923] transition hover:bg-[#ffe5d8]"
+                      onClick={() => deleteWorkItem(item.id)}
+                      type="button"
+                    >
+                      <Trash2 className="h-4 w-4" aria-hidden="true" />
+                      삭제
+                    </button>
+                  </>
                 )}
               </div>
             </article>
