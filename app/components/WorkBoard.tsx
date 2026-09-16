@@ -352,21 +352,21 @@ export function WorkBoard({ initialItems }: { initialItems: WorkItem[] }) {
       </div>
 
       <form
-        className="grid gap-3 rounded-lg border border-[#d9ded4] bg-white p-4 shadow-sm md:grid-cols-[minmax(220px,1fr)_120px_120px_120px_120px_120px_auto]"
+        className="grid gap-3 rounded-lg border border-[#d9ded4] bg-white p-4 shadow-sm sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-[minmax(220px,1fr)_110px_110px_110px_110px_110px_80px]"
         onSubmit={addWorkItem}
       >
-        <label className="grid gap-1 text-sm font-semibold text-[#4d574c]">
+        <label className="grid min-w-0 gap-1 text-sm font-semibold text-[#4d574c]">
           새 업무
           <input
-            className="h-10 rounded-md border border-[#d5dbd0] px-3 font-normal outline-none focus:border-[#22362b] focus:ring-2 focus:ring-[#c7d6c4]"
+            className="h-10 w-full rounded-md border border-[#d5dbd0] px-3 font-normal outline-none focus:border-[#22362b] focus:ring-2 focus:ring-[#c7d6c4]"
             name="title"
             placeholder="예: 금일 출고 지연 사유 공유"
           />
         </label>
-        <label className="grid gap-1 text-sm font-semibold text-[#4d574c]">
+        <label className="grid min-w-0 gap-1 text-sm font-semibold text-[#4d574c]">
           부서
           <select
-            className="h-10 rounded-md border border-[#d5dbd0] px-3 font-normal outline-none focus:border-[#22362b] focus:ring-2 focus:ring-[#c7d6c4]"
+            className="h-10 w-full rounded-md border border-[#d5dbd0] px-3 font-normal outline-none focus:border-[#22362b] focus:ring-2 focus:ring-[#c7d6c4]"
             name="department"
           >
             {departments.slice(1).map((department) => (
@@ -374,26 +374,26 @@ export function WorkBoard({ initialItems }: { initialItems: WorkItem[] }) {
             ))}
           </select>
         </label>
-        <label className="grid gap-1 text-sm font-semibold text-[#4d574c]">
+        <label className="grid min-w-0 gap-1 text-sm font-semibold text-[#4d574c]">
           담당자
           <input
-            className="h-10 rounded-md border border-[#d5dbd0] px-3 font-normal outline-none focus:border-[#22362b] focus:ring-2 focus:ring-[#c7d6c4]"
+            className="h-10 w-full rounded-md border border-[#d5dbd0] px-3 font-normal outline-none focus:border-[#22362b] focus:ring-2 focus:ring-[#c7d6c4]"
             name="owner"
             placeholder="이름"
           />
         </label>
-        <label className="grid gap-1 text-sm font-semibold text-[#4d574c]">
+        <label className="grid min-w-0 gap-1 text-sm font-semibold text-[#4d574c]">
           마감
           <input
-            className="h-10 rounded-md border border-[#d5dbd0] px-3 font-normal outline-none focus:border-[#22362b] focus:ring-2 focus:ring-[#c7d6c4]"
+            className="h-10 w-full rounded-md border border-[#d5dbd0] px-3 font-normal outline-none focus:border-[#22362b] focus:ring-2 focus:ring-[#c7d6c4]"
             name="due"
             placeholder="오늘"
           />
         </label>
-        <label className="grid gap-1 text-sm font-semibold text-[#4d574c]">
+        <label className="grid min-w-0 gap-1 text-sm font-semibold text-[#4d574c]">
           상태
           <select
-            className="h-10 rounded-md border border-[#d5dbd0] px-3 font-normal outline-none focus:border-[#22362b] focus:ring-2 focus:ring-[#c7d6c4]"
+            className="h-10 w-full rounded-md border border-[#d5dbd0] px-3 font-normal outline-none focus:border-[#22362b] focus:ring-2 focus:ring-[#c7d6c4]"
             name="status"
           >
             {statuses.map((status) => (
@@ -401,10 +401,10 @@ export function WorkBoard({ initialItems }: { initialItems: WorkItem[] }) {
             ))}
           </select>
         </label>
-        <label className="grid gap-1 text-sm font-semibold text-[#4d574c]">
+        <label className="grid min-w-0 gap-1 text-sm font-semibold text-[#4d574c]">
           우선순위
           <select
-            className="h-10 rounded-md border border-[#d5dbd0] px-3 font-normal outline-none focus:border-[#22362b] focus:ring-2 focus:ring-[#c7d6c4]"
+            className="h-10 w-full rounded-md border border-[#d5dbd0] px-3 font-normal outline-none focus:border-[#22362b] focus:ring-2 focus:ring-[#c7d6c4]"
             name="priority"
             defaultValue="보통"
           >
@@ -414,7 +414,7 @@ export function WorkBoard({ initialItems }: { initialItems: WorkItem[] }) {
           </select>
         </label>
         <button
-          className="mt-auto inline-flex h-10 items-center justify-center gap-2 rounded-md bg-[#22362b] px-4 text-sm font-bold text-white transition hover:bg-[#314c3d]"
+          className="mt-auto inline-flex h-10 w-full items-center justify-center gap-2 rounded-md bg-[#22362b] px-4 text-sm font-bold text-white transition hover:bg-[#314c3d] 2xl:w-auto"
           type="submit"
         >
           <Plus className="h-4 w-4" aria-hidden="true" />
