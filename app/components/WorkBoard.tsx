@@ -14,6 +14,10 @@ import {
   X,
 } from "lucide-react";
 import { FormEvent, useEffect, useMemo, useState } from "react";
+import {
+  WORKBOARD_ACTIVE_DEPARTMENT_EVENT,
+  WORKBOARD_DEPARTMENT_EVENT,
+} from "./MetricCards";
 
 export type Department = "전체" | "생산" | "물류" | "재고" | "회계";
 type Status = "진행중" | "확인필요" | "완료";
@@ -28,6 +32,7 @@ export type WorkItem = {
   due: string;
   status: Status;
   priority: Priority;
+  receivableAmount?: number;
 };
 
 const STORAGE_KEY = "business-work-hub-items";
@@ -75,6 +80,10 @@ function formatDateLabel(dateValue: string) {
 function formatLongDate(dateValue: string) {
   const [year, month, day] = dateValue.split("-");
   return `${year}년 ${Number(month)}월 ${Number(day)}일`;
+}
+
+function formatWon(amount: number) {
+  return `${new Intl.NumberFormat("ko-KR").format(amount)}원`;
 }
 
 function getItemDate(item: Pick<WorkItem, "date">) {
@@ -309,6 +318,11 @@ function MonthlyCalendar({
                   <p className="text-sm font-semibold text-[#141914]">
                     {item.title}
                   </p>
+                  {item.receivableAmount ? (
+                    <p className="mt-2 text-sm font-bold text-[#b4495f]">
+                      미수금 {formatWon(item.receivableAmount)}
+                    </p>
+                  ) : null}
                 </article>
               ))}
             </div>
@@ -334,6 +348,8 @@ export function WorkBoard({ initialItems }: { initialItems: WorkItem[] }) {
   const [isReady, setIsReady] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editDraft, setEditDraft] = useState<WorkItem | null>(null);
+  const [formDepartment, setFormDepartment] =
+    useState<WorkItem["department"]>("생산");
   const defaultDueDate = todayDateValue();
 
   useEffect(() => {
@@ -349,6 +365,27 @@ export function WorkBoard({ initialItems }: { initialItems: WorkItem[] }) {
       window.localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
     }
   }, [isReady, items]);
+
+  useEffect(() => {
+    const handleDepartment = (event: Event) => {
+      const department = (event as CustomEvent<Department>).detail;
+      if (departments.includes(department)) {
+        setActiveDepartment(department);
+      }
+    };
+
+    window.addEventListener(WORKBOARD_DEPARTMENT_EVENT, handleDepartment);
+    return () =>
+      window.removeEventListener(WORKBOARD_DEPARTMENT_EVENT, handleDepartment);
+  }, []);
+
+  useEffect(() => {
+    window.dispatchEvent(
+      new CustomEvent(WORKBOARD_ACTIVE_DEPARTMENT_EVENT, {
+        detail: activeDepartment,
+      }),
+    );
+  }, [activeDepartment]);
 
   const normalizedQuery = query.trim().toLowerCase();
   const filteredItems = useMemo(() => {
@@ -375,6 +412,9 @@ export function WorkBoard({ initialItems }: { initialItems: WorkItem[] }) {
     const date = String(form.get("date") || defaultDueDate);
     const due = formatDateLabel(date);
     const status = String(form.get("status") || "진행중") as Status;
+    const amountValue = Number(form.get("receivableAmount") || 0);
+    const receivableAmount =
+      department === "회계" && amountValue > 0 ? amountValue : undefined;
 
     if (!title) {
       return;
@@ -390,10 +430,12 @@ export function WorkBoard({ initialItems }: { initialItems: WorkItem[] }) {
         due,
         status,
         priority: "보통",
+        receivableAmount,
       },
       ...current,
     ]);
     event.currentTarget.reset();
+    setFormDepartment("생산");
   }
 
   function startEdit(item: WorkItem) {
@@ -416,6 +458,10 @@ export function WorkBoard({ initialItems }: { initialItems: WorkItem[] }) {
       owner: editDraft.owner.trim() || "담당자",
       date: getItemDate(editDraft),
       due: formatDateLabel(getItemDate(editDraft)),
+      receivableAmount:
+        editDraft.department === "회계" && editDraft.receivableAmount
+          ? editDraft.receivableAmount
+          : undefined,
     };
 
     setItems((current) =>
@@ -441,14 +487,17 @@ export function WorkBoard({ initialItems }: { initialItems: WorkItem[] }) {
   return (
     <>
       <MonthlyCalendar
-        items={items}
+        items={filteredItems}
         month={calendarMonth}
         onMonthChange={setCalendarMonth}
         selectedDate={selectedDate}
         onSelectDate={setSelectedDate}
       />
 
-      <div className="rounded-lg border border-[#d9ded4] bg-white shadow-sm">
+      <div
+        className="scroll-mt-4 rounded-lg border border-[#d9ded4] bg-white shadow-sm"
+        id="shared-work"
+      >
         <div className="flex flex-col gap-4 border-b border-[#e5e9e0] p-4">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
@@ -531,14 +580,44 @@ export function WorkBoard({ initialItems }: { initialItems: WorkItem[] }) {
                   )}
                 </div>
                 {isEditing ? (
-                  <input
-                    aria-label="업무명 수정"
-                    className="mt-2 h-10 w-full rounded-md border border-[#d5dbd0] px-3 text-sm font-semibold text-[#141914] outline-none focus:border-[#22362b] focus:ring-2 focus:ring-[#c7d6c4]"
-                    onChange={(event) => updateDraft("title", event.target.value)}
-                    value={editDraft.title}
-                  />
+                  <div className="mt-2 grid gap-2">
+                    <input
+                      aria-label="업무명 수정"
+                      className="h-10 w-full rounded-md border border-[#d5dbd0] px-3 text-sm font-semibold text-[#141914] outline-none focus:border-[#22362b] focus:ring-2 focus:ring-[#c7d6c4]"
+                      onChange={(event) =>
+                        updateDraft("title", event.target.value)
+                      }
+                      value={editDraft.title}
+                    />
+                    {editDraft.department === "회계" ? (
+                      <input
+                        aria-label="미수금액 수정"
+                        className="h-10 w-full rounded-md border border-[#e8cbd1] px-3 text-sm font-semibold text-[#8f3147] outline-none focus:border-[#b4495f] focus:ring-2 focus:ring-[#f2d9df]"
+                        min="0"
+                        onChange={(event) =>
+                          updateDraft(
+                            "receivableAmount",
+                            Number(event.target.value) || undefined,
+                          )
+                        }
+                        placeholder="미수금액"
+                        step="1000"
+                        type="number"
+                        value={editDraft.receivableAmount ?? ""}
+                      />
+                    ) : null}
+                  </div>
                 ) : (
-                  <h3 className="mt-2 font-semibold text-[#141914]">{item.title}</h3>
+                  <>
+                    <h3 className="mt-2 font-semibold text-[#141914]">
+                      {item.title}
+                    </h3>
+                    {item.receivableAmount ? (
+                      <p className="mt-1 text-sm font-bold text-[#b4495f]">
+                        미수금 {formatWon(item.receivableAmount)}
+                      </p>
+                    ) : null}
+                  </>
                 )}
               </div>
               <div className="flex items-center gap-2 text-sm text-[#5d685c]">
@@ -663,7 +742,11 @@ export function WorkBoard({ initialItems }: { initialItems: WorkItem[] }) {
       </div>
 
       <form
-        className="grid gap-3 rounded-lg border border-[#d9ded4] bg-white p-4 shadow-sm sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-[minmax(220px,1fr)_110px_110px_130px_110px_72px]"
+        className={`grid gap-3 rounded-lg border border-[#d9ded4] bg-white p-4 shadow-sm sm:grid-cols-2 lg:grid-cols-3 ${
+          formDepartment === "회계"
+            ? "2xl:grid-cols-[minmax(220px,1fr)_110px_110px_130px_110px_150px_72px]"
+            : "2xl:grid-cols-[minmax(220px,1fr)_110px_110px_130px_110px_72px]"
+        }`}
         onSubmit={addWorkItem}
       >
         <label className="grid min-w-0 gap-1 text-sm font-semibold text-[#4d574c]">
@@ -679,6 +762,10 @@ export function WorkBoard({ initialItems }: { initialItems: WorkItem[] }) {
           <select
             className="h-10 w-full rounded-md border border-[#d5dbd0] px-3 font-normal outline-none focus:border-[#22362b] focus:ring-2 focus:ring-[#c7d6c4]"
             name="department"
+            onChange={(event) =>
+              setFormDepartment(event.target.value as WorkItem["department"])
+            }
+            value={formDepartment}
           >
             {workDepartments.map((department) => (
               <option key={department}>{department}</option>
@@ -713,6 +800,20 @@ export function WorkBoard({ initialItems }: { initialItems: WorkItem[] }) {
             ))}
           </select>
         </label>
+        {formDepartment === "회계" ? (
+          <label className="grid min-w-0 gap-1 text-sm font-semibold text-[#8f3147]">
+            미수금액
+            <input
+              className="h-10 w-full rounded-md border border-[#e8cbd1] px-3 font-normal text-[#141914] outline-none focus:border-[#b4495f] focus:ring-2 focus:ring-[#f2d9df]"
+              inputMode="numeric"
+              min="0"
+              name="receivableAmount"
+              placeholder="원 단위"
+              step="1000"
+              type="number"
+            />
+          </label>
+        ) : null}
         <button
           className="mt-auto inline-flex h-10 w-full items-center justify-center rounded-md bg-[#22362b] px-3 text-sm font-bold leading-none text-white transition hover:bg-[#314c3d] 2xl:w-auto"
           type="submit"

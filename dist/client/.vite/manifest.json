@@ -10,18 +10,29 @@
     "file": "_next/static/chunks/rolldown-runtime-C60lm6uB.js",
     "name": "rolldown-runtime"
   },
-  "app/components/WorkBoard.tsx": {
-    "file": "_next/static/chunks/WorkBoard-Cyy2zz9c.js",
-    "name": "WorkBoard",
-    "src": "app/components/WorkBoard.tsx",
+  "app/components/MetricCards.tsx": {
+    "file": "_next/static/chunks/MetricCards-UFqT5KXl.js",
+    "name": "MetricCards",
+    "src": "app/components/MetricCards.tsx",
     "isDynamicEntry": true,
     "imports": [
       "_rolldown-runtime-C60lm6uB.js",
       "_framework-BgSIrAUN.js"
     ]
   },
+  "app/components/WorkBoard.tsx": {
+    "file": "_next/static/chunks/WorkBoard-DOEA9gEK.js",
+    "name": "WorkBoard",
+    "src": "app/components/WorkBoard.tsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "_rolldown-runtime-C60lm6uB.js",
+      "app/components/MetricCards.tsx",
+      "_framework-BgSIrAUN.js"
+    ]
+  },
   "node_modules/vinext/dist/shims/layout-segment-context.js": {
-    "file": "_next/static/chunks/layout-segment-context-DWgCo3ul.js",
+    "file": "_next/static/chunks/layout-segment-context-CHw1WCPF.js",
     "name": "layout-segment-context",
     "src": "node_modules/vinext/dist/shims/layout-segment-context.js",
     "isDynamicEntry": true,
@@ -32,7 +43,7 @@
     ]
   },
   "virtual:vinext-app-browser-entry": {
-    "file": "_next/static/chunks/index-CmEbpczy.js",
+    "file": "_next/static/chunks/index-DqTTHAKG.js",
     "name": "index",
     "src": "virtual:vinext-app-browser-entry",
     "isEntry": true,
@@ -43,6 +54,7 @@
     "dynamicImports": [
       "virtual:vinext-app-browser-entry",
       "node_modules/vinext/dist/shims/layout-segment-context.js",
+      "app/components/MetricCards.tsx",
       "app/components/WorkBoard.tsx"
     ]
   }

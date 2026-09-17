@@ -1,16 +1,13 @@
 import {
   ArrowRight,
   Building2,
-  Calculator,
   CheckCircle2,
-  Factory,
   FileText,
   Filter,
   RefreshCw,
   ShieldCheck,
-  Truck,
-  Warehouse,
 } from "lucide-react";
+import { MetricCards } from "./components/MetricCards";
 import { WorkBoard, type WorkItem } from "./components/WorkBoard";
 
 const initialWorkItems: WorkItem[] = [
@@ -46,13 +43,14 @@ const initialWorkItems: WorkItem[] = [
   },
   {
     id: 4,
-    title: "7월 매입 세금계산서 누락분 정리",
+    title: "9월 거래처 미수금 확인",
     department: "회계",
     owner: "최정산",
     date: "2026-09-17",
     due: "내일 12:00",
     status: "확인필요",
     priority: "보통",
+    receivableAmount: 24800000,
   },
   {
     id: 5,
@@ -63,37 +61,6 @@ const initialWorkItems: WorkItem[] = [
     due: "금요일",
     status: "완료",
     priority: "낮음",
-  },
-];
-
-const metrics = [
-  {
-    label: "오늘 생산 달성률",
-    value: "92%",
-    trend: "+4%",
-    icon: Factory,
-    tone: "emerald",
-  },
-  {
-    label: "출고 대기 건",
-    value: "18",
-    trend: "-3건",
-    icon: Truck,
-    tone: "blue",
-  },
-  {
-    label: "안전재고 미달",
-    value: "7",
-    trend: "+2건",
-    icon: Warehouse,
-    tone: "amber",
-  },
-  {
-    label: "미수 확인 필요",
-    value: "₩24.8M",
-    trend: "5개처",
-    icon: Calculator,
-    tone: "rose",
   },
 ];
 
@@ -137,34 +104,7 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            {metrics.map((metric) => {
-              const Icon = metric.icon;
-              return (
-                <article
-                  className="rounded-lg border border-[#d9ded4] bg-white p-4 shadow-sm"
-                  key={metric.label}
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <p className="text-sm font-medium text-[#687266]">
-                        {metric.label}
-                      </p>
-                      <p className="mt-2 text-2xl font-semibold">
-                        {metric.value}
-                      </p>
-                    </div>
-                    <span className={`metric-icon ${metric.tone}`}>
-                      <Icon className="h-5 w-5" aria-hidden="true" />
-                    </span>
-                  </div>
-                  <p className="mt-3 text-sm font-semibold text-[#526152]">
-                    전일 대비 {metric.trend}
-                  </p>
-                </article>
-              );
-            })}
-          </div>
+          <MetricCards />
         </div>
       </section>
 
