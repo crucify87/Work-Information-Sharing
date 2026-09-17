@@ -11,7 +11,7 @@
     "name": "rolldown-runtime"
   },
   "app/components/WorkBoard.tsx": {
-    "file": "_next/static/chunks/WorkBoard-Ctvil7Kr.js",
+    "file": "_next/static/chunks/WorkBoard-Cyy2zz9c.js",
     "name": "WorkBoard",
     "src": "app/components/WorkBoard.tsx",
     "isDynamicEntry": true,
@@ -21,7 +21,7 @@
     ]
   },
   "node_modules/vinext/dist/shims/layout-segment-context.js": {
-    "file": "_next/static/chunks/layout-segment-context-DHEEWh3D.js",
+    "file": "_next/static/chunks/layout-segment-context-DWgCo3ul.js",
     "name": "layout-segment-context",
     "src": "node_modules/vinext/dist/shims/layout-segment-context.js",
     "isDynamicEntry": true,
@@ -32,7 +32,7 @@
     ]
   },
   "virtual:vinext-app-browser-entry": {
-    "file": "_next/static/chunks/index-BzLb6j6a.js",
+    "file": "_next/static/chunks/index-CmEbpczy.js",
     "name": "index",
     "src": "virtual:vinext-app-browser-entry",
     "isEntry": true,

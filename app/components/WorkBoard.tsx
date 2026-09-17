@@ -497,7 +497,7 @@ export function WorkBoard({ initialItems }: { initialItems: WorkItem[] }) {
 
             return (
             <article
-              className="grid gap-3 p-4 transition hover:bg-[#fbfcf8] md:grid-cols-[1fr_150px_130px_110px_144px]"
+              className="grid gap-3 p-4 transition hover:bg-[#fbfcf8] md:grid-cols-[minmax(0,1fr)_150px_130px_110px_160px]"
               key={item.id}
             >
               <div>
@@ -608,7 +608,7 @@ export function WorkBoard({ initialItems }: { initialItems: WorkItem[] }) {
                   </span>
                 )}
               </div>
-              <div className="flex items-start gap-2 md:justify-end">
+              <div className="flex min-w-[152px] flex-nowrap items-start gap-2 md:justify-end">
                 {isEditing ? (
                   <>
                     <button
@@ -632,7 +632,7 @@ export function WorkBoard({ initialItems }: { initialItems: WorkItem[] }) {
                   <>
                     <button
                       aria-label={`${item.title} 수정`}
-                      className="inline-flex h-9 min-w-14 items-center justify-center gap-1 rounded-md bg-[#eef1eb] px-2 text-xs font-bold leading-none text-[#4d574c] transition hover:bg-[#e0e5dc]"
+                      className="inline-flex h-9 w-[72px] shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-md bg-[#eef1eb] px-2 text-xs font-bold leading-none text-[#4d574c] transition hover:bg-[#e0e5dc]"
                       onClick={() => startEdit(item)}
                       type="button"
                     >
@@ -641,7 +641,7 @@ export function WorkBoard({ initialItems }: { initialItems: WorkItem[] }) {
                     </button>
                     <button
                       aria-label={`${item.title} 삭제`}
-                      className="inline-flex h-9 min-w-14 items-center justify-center gap-1 rounded-md bg-[#fff2eb] px-2 text-xs font-bold leading-none text-[#b44923] transition hover:bg-[#ffe5d8]"
+                      className="inline-flex h-9 w-[72px] shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-md bg-[#fff2eb] px-2 text-xs font-bold leading-none text-[#b44923] transition hover:bg-[#ffe5d8]"
                       onClick={() => deleteWorkItem(item.id)}
                       type="button"
                     >
