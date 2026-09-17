@@ -8,7 +8,8 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { MetricCards } from "./components/MetricCards";
-import { WorkBoard, type WorkItem } from "./components/WorkBoard";
+import { WorkBoard } from "./components/WorkBoard";
+import type { WorkItem } from "./lib/work-items";
 
 const initialWorkItems: WorkItem[] = [
   {

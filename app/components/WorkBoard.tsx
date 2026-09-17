@@ -15,32 +15,25 @@ import {
 } from "lucide-react";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import {
+  departments,
+  isDateValue,
+  normalizeStoredItems,
+  priorities,
+  statuses,
+  workDepartments,
+  type Department,
+  type Priority,
+  type Status,
+  type WorkItem,
+} from "../lib/work-items";
+import {
   WORKBOARD_ACTIVE_DEPARTMENT_EVENT,
   WORKBOARD_DEPARTMENT_EVENT,
 } from "./MetricCards";
 
-export type Department = "전체" | "생산" | "물류" | "재고" | "회계";
-type Status = "진행중" | "확인필요" | "완료";
-type Priority = "긴급" | "보통" | "낮음";
-
-export type WorkItem = {
-  id: number;
-  title: string;
-  department: Exclude<Department, "전체">;
-  owner: string;
-  date?: string;
-  due: string;
-  status: Status;
-  priority: Priority;
-  receivableAmount?: number;
-};
+export type { WorkItem } from "../lib/work-items";
 
 const STORAGE_KEY = "business-work-hub-items";
-
-const departments: Department[] = ["전체", "생산", "물류", "재고", "회계"];
-const workDepartments: WorkItem["department"][] = ["생산", "물류", "재고", "회계"];
-const statuses: Status[] = ["진행중", "확인필요", "완료"];
-const priorities: Priority[] = ["긴급", "보통", "낮음"];
 
 const statusStyles: Record<Status, string> = {
   진행중: "bg-sky-50 text-sky-700 ring-sky-200",
@@ -66,10 +59,6 @@ function toDateInputValue(date: Date) {
 
 function todayDateValue() {
   return toDateInputValue(new Date());
-}
-
-function isDateValue(value: unknown): value is string {
-  return typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value);
 }
 
 function formatDateLabel(dateValue: string) {
@@ -128,7 +117,7 @@ function readSavedItems(fallback: WorkItem[]) {
       return fallback;
     }
     const parsed = JSON.parse(saved);
-    return Array.isArray(parsed) ? (parsed as WorkItem[]) : fallback;
+    return normalizeStoredItems(parsed, fallback);
   } catch {
     return fallback;
   }
@@ -362,7 +351,11 @@ export function WorkBoard({ initialItems }: { initialItems: WorkItem[] }) {
 
   useEffect(() => {
     if (isReady) {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+      try {
+        window.localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+      } catch {
+        // Keep the current session usable when browser storage is unavailable.
+      }
     }
   }, [isReady, items]);
 
@@ -404,36 +397,48 @@ export function WorkBoard({ initialItems }: { initialItems: WorkItem[] }) {
   function addWorkItem(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = new FormData(event.currentTarget);
-    const title = String(form.get("title") || "").trim();
+    const title = String(form.get("title") || "").trim().slice(0, 120);
     const department = String(
       form.get("department") || "생산",
     ) as WorkItem["department"];
-    const owner = String(form.get("owner") || "").trim() || "담당자";
-    const date = String(form.get("date") || defaultDueDate);
+    const owner =
+      String(form.get("owner") || "").trim().slice(0, 40) || "담당자";
+    const requestedDate = String(form.get("date") || "");
+    const date = isDateValue(requestedDate) ? requestedDate : defaultDueDate;
     const due = formatDateLabel(date);
     const status = String(form.get("status") || "진행중") as Status;
     const amountValue = Number(form.get("receivableAmount") || 0);
     const receivableAmount =
-      department === "회계" && amountValue > 0 ? amountValue : undefined;
+      department === "회계" &&
+      Number.isFinite(amountValue) &&
+      amountValue > 0
+        ? Math.round(amountValue)
+        : undefined;
 
     if (!title) {
       return;
     }
 
-    setItems((current) => [
-      {
-        id: Date.now(),
-        title,
-        department,
-        owner,
-        date,
-        due,
-        status,
-        priority: "보통",
-        receivableAmount,
-      },
-      ...current,
-    ]);
+    setItems((current) => {
+      const nextId = Math.max(
+        Date.now(),
+        ...current.map((item) => item.id + 1),
+      );
+      return [
+        {
+          id: nextId,
+          title,
+          department,
+          owner,
+          date,
+          due,
+          status,
+          priority: "보통",
+          receivableAmount,
+        },
+        ...current,
+      ];
+    });
     event.currentTarget.reset();
     setFormDepartment("생산");
   }
@@ -454,13 +459,15 @@ export function WorkBoard({ initialItems }: { initialItems: WorkItem[] }) {
 
     const updatedItem = {
       ...editDraft,
-      title: editDraft.title.trim(),
-      owner: editDraft.owner.trim() || "담당자",
+      title: editDraft.title.trim().slice(0, 120),
+      owner: editDraft.owner.trim().slice(0, 40) || "담당자",
       date: getItemDate(editDraft),
       due: formatDateLabel(getItemDate(editDraft)),
       receivableAmount:
-        editDraft.department === "회계" && editDraft.receivableAmount
-          ? editDraft.receivableAmount
+        editDraft.department === "회계" &&
+        Number.isFinite(editDraft.receivableAmount) &&
+        Number(editDraft.receivableAmount) > 0
+          ? Math.round(Number(editDraft.receivableAmount))
           : undefined,
     };
 
@@ -587,6 +594,7 @@ export function WorkBoard({ initialItems }: { initialItems: WorkItem[] }) {
                       onChange={(event) =>
                         updateDraft("title", event.target.value)
                       }
+                      maxLength={120}
                       value={editDraft.title}
                     />
                     {editDraft.department === "회계" ? (
@@ -627,6 +635,7 @@ export function WorkBoard({ initialItems }: { initialItems: WorkItem[] }) {
                     aria-label="담당자 수정"
                     className="h-9 min-w-0 rounded-md border border-[#d5dbd0] px-2 outline-none focus:border-[#22362b] focus:ring-2 focus:ring-[#c7d6c4]"
                     onChange={(event) => updateDraft("owner", event.target.value)}
+                    maxLength={40}
                     value={editDraft.owner}
                   />
                 ) : (
@@ -754,7 +763,9 @@ export function WorkBoard({ initialItems }: { initialItems: WorkItem[] }) {
           <input
             className="h-10 w-full rounded-md border border-[#d5dbd0] px-3 font-normal outline-none focus:border-[#22362b] focus:ring-2 focus:ring-[#c7d6c4]"
             name="title"
+            maxLength={120}
             placeholder="예: 금일 출고 지연 사유 공유"
+            required
           />
         </label>
         <label className="grid min-w-0 gap-1 text-sm font-semibold text-[#4d574c]">
@@ -777,6 +788,7 @@ export function WorkBoard({ initialItems }: { initialItems: WorkItem[] }) {
           <input
             className="h-10 w-full rounded-md border border-[#d5dbd0] px-3 font-normal outline-none focus:border-[#22362b] focus:ring-2 focus:ring-[#c7d6c4]"
             name="owner"
+            maxLength={40}
             placeholder="이름"
           />
         </label>
