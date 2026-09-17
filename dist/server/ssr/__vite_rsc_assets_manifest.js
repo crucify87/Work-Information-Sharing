@@ -1,25 +1,25 @@
 export default {
-  "bootstrapScriptContent": "import(\"/_next/static/chunks/index-DK7RPUsq.js\")",
+  "bootstrapScriptContent": "import(\"/_next/static/chunks/index-Ci5xR2_r.js\")",
   "clientReferenceDeps": {
     "bc7e44e4aeea": {
       "js": [
-        "/_next/static/chunks/MetricCards-CvANG00I.js",
+        "/_next/static/chunks/MetricCards-C6GzSCUM.js",
         "/_next/static/chunks/rolldown-runtime-C60lm6uB.js",
         "/_next/static/chunks/createLucideIcon-BJlfQhGe.js",
         "/_next/static/chunks/framework-BgSIrAUN.js",
-        "/_next/static/chunks/index-DK7RPUsq.js"
+        "/_next/static/chunks/index-Ci5xR2_r.js"
       ],
       "css": []
     },
     "ece7e9f4547e": {
       "js": [
-        "/_next/static/chunks/WorkBoard-DULWC68p.js",
+        "/_next/static/chunks/WorkBoard-BlIUMbxw.js",
         "/_next/static/chunks/rolldown-runtime-C60lm6uB.js",
-        "/_next/static/chunks/MetricCards-CvANG00I.js",
+        "/_next/static/chunks/MetricCards-C6GzSCUM.js",
         "/_next/static/chunks/createLucideIcon-BJlfQhGe.js",
         "/_next/static/chunks/framework-BgSIrAUN.js",
         "/_next/static/chunks/triangle-alert-BRQgW3xU.js",
-        "/_next/static/chunks/index-DK7RPUsq.js"
+        "/_next/static/chunks/index-Ci5xR2_r.js"
       ],
       "css": []
     },
@@ -30,13 +30,13 @@ export default {
         "/_next/static/chunks/rolldown-runtime-C60lm6uB.js",
         "/_next/static/chunks/framework-BgSIrAUN.js",
         "/_next/static/chunks/triangle-alert-BRQgW3xU.js",
-        "/_next/static/chunks/index-DK7RPUsq.js"
+        "/_next/static/chunks/index-Ci5xR2_r.js"
       ],
       "css": []
     },
     "9276801271d6": {
       "js": [
-        "/_next/static/chunks/index-DK7RPUsq.js",
+        "/_next/static/chunks/index-Ci5xR2_r.js",
         "/_next/static/chunks/rolldown-runtime-C60lm6uB.js",
         "/_next/static/chunks/framework-BgSIrAUN.js"
       ],
@@ -44,7 +44,7 @@ export default {
     },
     "0b874ad30386": {
       "js": [
-        "/_next/static/chunks/index-DK7RPUsq.js",
+        "/_next/static/chunks/index-Ci5xR2_r.js",
         "/_next/static/chunks/rolldown-runtime-C60lm6uB.js",
         "/_next/static/chunks/framework-BgSIrAUN.js"
       ],
@@ -52,7 +52,7 @@ export default {
     },
     "593f344dc510": {
       "js": [
-        "/_next/static/chunks/index-DK7RPUsq.js",
+        "/_next/static/chunks/index-Ci5xR2_r.js",
         "/_next/static/chunks/rolldown-runtime-C60lm6uB.js",
         "/_next/static/chunks/framework-BgSIrAUN.js"
       ],
@@ -60,7 +60,7 @@ export default {
     },
     "bad85346fc72": {
       "js": [
-        "/_next/static/chunks/index-DK7RPUsq.js",
+        "/_next/static/chunks/index-Ci5xR2_r.js",
         "/_next/static/chunks/rolldown-runtime-C60lm6uB.js",
         "/_next/static/chunks/framework-BgSIrAUN.js"
       ],
@@ -68,16 +68,16 @@ export default {
     },
     "15c18cfaeeff": {
       "js": [
-        "/_next/static/chunks/layout-segment-context-CsFcUvm4.js",
+        "/_next/static/chunks/layout-segment-context-B535Goee.js",
         "/_next/static/chunks/rolldown-runtime-C60lm6uB.js",
-        "/_next/static/chunks/index-DK7RPUsq.js",
+        "/_next/static/chunks/index-Ci5xR2_r.js",
         "/_next/static/chunks/framework-BgSIrAUN.js"
       ],
       "css": []
     },
     "8c0f216c4604": {
       "js": [
-        "/_next/static/chunks/index-DK7RPUsq.js",
+        "/_next/static/chunks/index-Ci5xR2_r.js",
         "/_next/static/chunks/rolldown-runtime-C60lm6uB.js",
         "/_next/static/chunks/framework-BgSIrAUN.js"
       ],
