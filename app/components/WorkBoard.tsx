@@ -751,10 +751,10 @@ export function WorkBoard({ initialItems }: { initialItems: WorkItem[] }) {
       </div>
 
       <form
-        className={`grid gap-3 rounded-lg border border-[#d9ded4] bg-white p-4 shadow-sm sm:grid-cols-2 lg:grid-cols-3 ${
+        className={`grid min-w-0 gap-3 rounded-lg border border-[#d9ded4] bg-white p-4 shadow-sm sm:grid-cols-2 lg:grid-cols-3 2xl:gap-2 ${
           formDepartment === "회계"
-            ? "2xl:grid-cols-[minmax(220px,1fr)_110px_110px_130px_110px_150px_72px]"
-            : "2xl:grid-cols-[minmax(220px,1fr)_110px_110px_130px_110px_72px]"
+            ? "2xl:grid-cols-[minmax(140px,1fr)_85px_85px_125px_85px_110px_72px]"
+            : "2xl:grid-cols-[minmax(140px,1fr)_90px_90px_125px_90px_72px]"
         }`}
         onSubmit={addWorkItem}
       >
@@ -827,7 +827,7 @@ export function WorkBoard({ initialItems }: { initialItems: WorkItem[] }) {
           </label>
         ) : null}
         <button
-          className="mt-auto inline-flex h-10 w-full items-center justify-center rounded-md bg-[#22362b] px-3 text-sm font-bold leading-none text-white transition hover:bg-[#314c3d] 2xl:w-auto"
+          className="relative z-10 mt-auto inline-flex h-10 w-full cursor-pointer items-center justify-center rounded-md bg-[#22362b] px-3 text-sm font-bold leading-none text-white transition hover:bg-[#314c3d] active:bg-[#17261e] focus:outline-none focus:ring-2 focus:ring-[#8ba394] focus:ring-offset-2 2xl:w-auto"
           type="submit"
         >
           <span className="whitespace-nowrap break-keep">등록</span>
