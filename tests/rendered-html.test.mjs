@@ -35,6 +35,7 @@ test("server-renders the current work-sharing app", async () => {
   assert.match(html, /미수 확인/);
   assert.match(html, /월간 업무 대시보드/);
   assert.match(html, /공유 업무/);
+  assert.match(html, /글꼴 설정/);
   assert.doesNotMatch(html, /<p class="text-sm font-medium text-\[#687266\]">안전재고 미달<\/p>/);
   assert.doesNotMatch(html, /Your site is taking shape|Building your site/);
 });

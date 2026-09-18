@@ -25,8 +25,15 @@
       "_createLucideIcon-BJlfQhGe.js"
     ]
   },
+  "_x-DA3GOwGK.js": {
+    "file": "_next/static/chunks/x-DA3GOwGK.js",
+    "name": "x",
+    "imports": [
+      "_createLucideIcon-BJlfQhGe.js"
+    ]
+  },
   "app/components/MetricCards.tsx": {
-    "file": "_next/static/chunks/MetricCards-C6GzSCUM.js",
+    "file": "_next/static/chunks/MetricCards-ZngH2FF5.js",
     "name": "MetricCards",
     "src": "app/components/MetricCards.tsx",
     "isDynamicEntry": true,
@@ -36,8 +43,20 @@
       "_framework-BgSIrAUN.js"
     ]
   },
+  "app/components/TypographySettings.tsx": {
+    "file": "_next/static/chunks/TypographySettings-Dg-jg-fH.js",
+    "name": "TypographySettings",
+    "src": "app/components/TypographySettings.tsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "_rolldown-runtime-C60lm6uB.js",
+      "_createLucideIcon-BJlfQhGe.js",
+      "_x-DA3GOwGK.js",
+      "_framework-BgSIrAUN.js"
+    ]
+  },
   "app/components/WorkBoard.tsx": {
-    "file": "_next/static/chunks/WorkBoard-BlIUMbxw.js",
+    "file": "_next/static/chunks/WorkBoard-DPQvjmD9.js",
     "name": "WorkBoard",
     "src": "app/components/WorkBoard.tsx",
     "isDynamicEntry": true,
@@ -46,11 +65,12 @@
       "app/components/MetricCards.tsx",
       "_createLucideIcon-BJlfQhGe.js",
       "_triangle-alert-BRQgW3xU.js",
+      "_x-DA3GOwGK.js",
       "_framework-BgSIrAUN.js"
     ]
   },
   "app/error.tsx": {
-    "file": "_next/static/chunks/error-DvDMuaDK.js",
+    "file": "_next/static/chunks/error-Cf0w5-OZ.js",
     "name": "error",
     "src": "app/error.tsx",
     "isDynamicEntry": true,
@@ -61,7 +81,7 @@
     ]
   },
   "node_modules/vinext/dist/shims/layout-segment-context.js": {
-    "file": "_next/static/chunks/layout-segment-context-B535Goee.js",
+    "file": "_next/static/chunks/layout-segment-context-BFdjQ-nA.js",
     "name": "layout-segment-context",
     "src": "node_modules/vinext/dist/shims/layout-segment-context.js",
     "isDynamicEntry": true,
@@ -72,7 +92,7 @@
     ]
   },
   "virtual:vinext-app-browser-entry": {
-    "file": "_next/static/chunks/index-Ci5xR2_r.js",
+    "file": "_next/static/chunks/index-BSw69kQh.js",
     "name": "index",
     "src": "virtual:vinext-app-browser-entry",
     "isEntry": true,
@@ -83,6 +103,7 @@
     "dynamicImports": [
       "virtual:vinext-app-browser-entry",
       "node_modules/vinext/dist/shims/layout-segment-context.js",
+      "app/components/TypographySettings.tsx",
       "app/error.tsx",
       "app/components/MetricCards.tsx",
       "app/components/WorkBoard.tsx"

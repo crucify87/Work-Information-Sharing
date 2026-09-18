@@ -8,6 +8,7 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { MetricCards } from "./components/MetricCards";
+import { TypographySettings } from "./components/TypographySettings";
 import { WorkBoard } from "./components/WorkBoard";
 import type { WorkItem } from "./lib/work-items";
 
@@ -91,18 +92,21 @@ export default function Home() {
     <main className="min-h-screen bg-[#f6f7f4] text-[#1c201c]">
       <section className="border-b border-[#d9ded4] bg-[#fbfcf8]">
         <div className="mx-auto flex max-w-7xl flex-col gap-6 px-5 py-6 lg:px-8">
-          <div className="flex flex-col gap-3">
-            <div className="flex items-center gap-2 text-sm font-semibold text-[#687266]">
-              <Building2 className="h-4 w-4" aria-hidden="true" />
-              work-information-sharing
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+            <div className="flex min-w-0 flex-col gap-3">
+              <div className="flex items-center gap-2 text-sm font-semibold text-[#687266]">
+                <Building2 className="h-4 w-4" aria-hidden="true" />
+                work-information-sharing
+              </div>
+              <h1 className="max-w-3xl text-3xl font-semibold tracking-normal text-[#111611] sm:text-4xl">
+                work-information-sharing
+              </h1>
+              <p className="max-w-2xl text-sm font-medium text-[#687266] sm:text-base">
+                부서별 업무, 인계, 재고 경보, 정산 확인 사항을 한 곳에 모아
+                마감 전에 놓치는 일을 줄입니다.
+              </p>
             </div>
-            <h1 className="max-w-3xl text-3xl font-semibold tracking-normal text-[#111611] sm:text-4xl">
-              work-information-sharing
-            </h1>
-            <p className="max-w-2xl text-sm font-medium text-[#687266] sm:text-base">
-              부서별 업무, 인계, 재고 경보, 정산 확인 사항을 한 곳에 모아
-              마감 전에 놓치는 일을 줄입니다.
-            </p>
+            <TypographySettings />
           </div>
 
           <MetricCards initialItems={initialWorkItems} />
