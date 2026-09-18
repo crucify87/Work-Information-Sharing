@@ -789,15 +789,15 @@ export function WorkBoard({ initialItems }: { initialItems: WorkItem[] }) {
       <form
         className={`grid min-w-0 gap-3 rounded-lg border border-[#d9ded4] bg-white p-4 shadow-sm sm:grid-cols-2 lg:grid-cols-3 2xl:gap-2 ${
           formDepartment === "회계" || formDepartment === "물류"
-            ? "2xl:grid-cols-[minmax(140px,1fr)_85px_85px_125px_85px_110px_72px]"
-            : "2xl:grid-cols-[minmax(140px,1fr)_90px_90px_125px_90px_72px]"
+            ? "2xl:grid-cols-[minmax(140px,1fr)_80px_80px_140px_100px_110px_72px]"
+            : "2xl:grid-cols-[minmax(140px,1fr)_90px_90px_140px_100px_72px]"
         }`}
         onSubmit={addWorkItem}
       >
         <label className="grid min-w-0 gap-1 text-sm font-semibold text-[#4d574c]">
           새 업무
           <input
-            className="h-10 w-full rounded-md border border-[#d5dbd0] px-3 font-normal outline-none focus:border-[#22362b] focus:ring-2 focus:ring-[#c7d6c4]"
+            className="h-10 w-full min-w-0 max-w-full rounded-md border border-[#d5dbd0] px-3 font-normal outline-none focus:border-[#22362b] focus:ring-2 focus:ring-[#c7d6c4]"
             name="title"
             maxLength={120}
             placeholder="예: 금일 출고 지연 사유 공유"
@@ -807,7 +807,7 @@ export function WorkBoard({ initialItems }: { initialItems: WorkItem[] }) {
         <label className="grid min-w-0 gap-1 text-sm font-semibold text-[#4d574c]">
           부서
           <select
-            className="h-10 w-full rounded-md border border-[#d5dbd0] px-3 font-normal outline-none focus:border-[#22362b] focus:ring-2 focus:ring-[#c7d6c4]"
+            className="h-10 w-full min-w-0 max-w-full rounded-md border border-[#d5dbd0] px-3 font-normal outline-none focus:border-[#22362b] focus:ring-2 focus:ring-[#c7d6c4]"
             name="department"
             onChange={(event) =>
               setFormDepartment(event.target.value as WorkItem["department"])
@@ -822,7 +822,7 @@ export function WorkBoard({ initialItems }: { initialItems: WorkItem[] }) {
         <label className="grid min-w-0 gap-1 text-sm font-semibold text-[#4d574c]">
           담당자
           <input
-            className="h-10 w-full rounded-md border border-[#d5dbd0] px-3 font-normal outline-none focus:border-[#22362b] focus:ring-2 focus:ring-[#c7d6c4]"
+            className="h-10 w-full min-w-0 max-w-full rounded-md border border-[#d5dbd0] px-3 font-normal outline-none focus:border-[#22362b] focus:ring-2 focus:ring-[#c7d6c4]"
             name="owner"
             maxLength={40}
             placeholder="이름"
@@ -831,7 +831,7 @@ export function WorkBoard({ initialItems }: { initialItems: WorkItem[] }) {
         <label className="grid min-w-0 gap-1 text-sm font-semibold text-[#4d574c]">
           마감
           <input
-            className="h-10 w-full rounded-md border border-[#d5dbd0] px-3 font-normal outline-none focus:border-[#22362b] focus:ring-2 focus:ring-[#c7d6c4]"
+            className="h-10 w-full min-w-0 max-w-full rounded-md border border-[#d5dbd0] px-2 font-normal outline-none focus:border-[#22362b] focus:ring-2 focus:ring-[#c7d6c4]"
             defaultValue={defaultDueDate}
             name="date"
             type="date"
@@ -840,7 +840,7 @@ export function WorkBoard({ initialItems }: { initialItems: WorkItem[] }) {
         <label className="grid min-w-0 gap-1 text-sm font-semibold text-[#4d574c]">
           상태
           <select
-            className="h-10 w-full rounded-md border border-[#d5dbd0] px-3 font-normal outline-none focus:border-[#22362b] focus:ring-2 focus:ring-[#c7d6c4]"
+            className="h-10 w-full min-w-0 max-w-full rounded-md border border-[#d5dbd0] px-2 font-normal outline-none focus:border-[#22362b] focus:ring-2 focus:ring-[#c7d6c4]"
             name="status"
           >
             {statuses.map((status) => (
@@ -852,7 +852,7 @@ export function WorkBoard({ initialItems }: { initialItems: WorkItem[] }) {
           <label className="grid min-w-0 gap-1 text-sm font-semibold text-[#8f3147]">
             미수금액
             <input
-              className="h-10 w-full rounded-md border border-[#e8cbd1] px-3 font-normal text-[#141914] outline-none focus:border-[#b4495f] focus:ring-2 focus:ring-[#f2d9df]"
+              className="h-10 w-full min-w-0 max-w-full rounded-md border border-[#e8cbd1] px-2 font-normal text-[#141914] outline-none focus:border-[#b4495f] focus:ring-2 focus:ring-[#f2d9df]"
               inputMode="numeric"
               min="0"
               name="receivableAmount"
@@ -866,7 +866,7 @@ export function WorkBoard({ initialItems }: { initialItems: WorkItem[] }) {
           <label className="grid min-w-0 gap-1 text-sm font-semibold text-[#315f8f]">
             입출고 구분
             <select
-              className="h-10 w-full rounded-md border border-[#cbdced] bg-white px-3 font-normal text-[#141914] outline-none focus:border-[#4079b5] focus:ring-2 focus:ring-[#dceafb]"
+              className="h-10 w-full min-w-0 max-w-full rounded-md border border-[#cbdced] bg-white px-2 font-normal text-[#141914] outline-none focus:border-[#4079b5] focus:ring-2 focus:ring-[#dceafb]"
               name="logisticsType"
             >
               {logisticsTypes.map((type) => (
