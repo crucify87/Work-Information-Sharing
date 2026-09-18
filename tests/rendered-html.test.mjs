@@ -90,6 +90,78 @@ test("normalizes malformed browser data without losing valid work", async () => 
   assert.deepEqual(normalizeStoredItems([], fallback), []);
 });
 
+test("builds dashboard metrics from department work items", async () => {
+  const { buildDashboardMetric } = await import(
+    new URL("../app/lib/work-items.ts", import.meta.url)
+  );
+
+  const metric = buildDashboardMetric(
+    [
+      {
+        id: 1,
+        title: "오전 생산 완료",
+        department: "생산",
+        owner: "담당자",
+        date: "2026-09-18",
+        due: "오늘",
+        status: "완료",
+        priority: "보통",
+      },
+      {
+        id: 2,
+        title: "오후 생산 확인",
+        department: "생산",
+        owner: "담당자",
+        date: "2026-09-18",
+        due: "오늘",
+        status: "진행중",
+        priority: "보통",
+      },
+      {
+        id: 3,
+        title: "제품 입고 검수",
+        department: "물류",
+        owner: "담당자",
+        due: "오늘",
+        status: "진행중",
+        priority: "보통",
+        logisticsType: "입고",
+      },
+      {
+        id: 4,
+        title: "거래처 출고 차량 배차",
+        department: "물류",
+        owner: "담당자",
+        due: "오늘",
+        status: "진행중",
+        priority: "보통",
+        logisticsType: "출고",
+      },
+      {
+        id: 5,
+        title: "거래처 미수금 확인",
+        department: "회계",
+        owner: "담당자",
+        due: "오늘",
+        status: "확인필요",
+        priority: "긴급",
+        receivableAmount: 120000,
+      },
+    ],
+    "2026-09-18",
+  );
+
+  assert.deepEqual(metric, {
+    productionRate: 50,
+    productionCompleted: 1,
+    productionTotal: 2,
+    inboundCount: 1,
+    outboundCount: 1,
+    receivableAmount: 120000,
+    receivableCount: 1,
+  });
+});
+
 test("keeps Cloudflare deployment deterministic", async () => {
   const config = JSON.parse(
     await readFile(new URL("../wrangler.jsonc", import.meta.url), "utf8"),

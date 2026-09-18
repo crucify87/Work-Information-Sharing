@@ -105,7 +105,7 @@ export default function Home() {
             </p>
           </div>
 
-          <MetricCards />
+          <MetricCards initialItems={initialWorkItems} />
         </div>
       </section>
 

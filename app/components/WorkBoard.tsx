@@ -17,9 +17,11 @@ import { FormEvent, useEffect, useMemo, useState } from "react";
 import {
   departments,
   isDateValue,
+  logisticsTypes,
   normalizeStoredItems,
   priorities,
   statuses,
+  WORK_ITEMS_STORAGE_KEY,
   workDepartments,
   type Department,
   type Priority,
@@ -29,11 +31,10 @@ import {
 import {
   WORKBOARD_ACTIVE_DEPARTMENT_EVENT,
   WORKBOARD_DEPARTMENT_EVENT,
+  WORKBOARD_ITEMS_EVENT,
 } from "./MetricCards";
 
 export type { WorkItem } from "../lib/work-items";
-
-const STORAGE_KEY = "business-work-hub-items";
 
 const statusStyles: Record<Status, string> = {
   진행중: "bg-sky-50 text-sky-700 ring-sky-200",
@@ -112,7 +113,7 @@ function buildCalendarDays(monthValue: string) {
 
 function readSavedItems(fallback: WorkItem[]) {
   try {
-    const saved = window.localStorage.getItem(STORAGE_KEY);
+    const saved = window.localStorage.getItem(WORK_ITEMS_STORAGE_KEY);
     if (!saved) {
       return fallback;
     }
@@ -352,11 +353,15 @@ export function WorkBoard({ initialItems }: { initialItems: WorkItem[] }) {
   useEffect(() => {
     if (isReady) {
       try {
-        window.localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+        window.localStorage.setItem(WORK_ITEMS_STORAGE_KEY, JSON.stringify(items));
       } catch {
         // Keep the current session usable when browser storage is unavailable.
       }
     }
+
+    window.dispatchEvent(
+      new CustomEvent(WORKBOARD_ITEMS_EVENT, { detail: items }),
+    );
   }, [isReady, items]);
 
   useEffect(() => {
@@ -407,6 +412,10 @@ export function WorkBoard({ initialItems }: { initialItems: WorkItem[] }) {
     const date = isDateValue(requestedDate) ? requestedDate : defaultDueDate;
     const due = formatDateLabel(date);
     const status = String(form.get("status") || "진행중") as Status;
+    const logisticsType =
+      department === "물류"
+        ? (String(form.get("logisticsType") || "입고") as WorkItem["logisticsType"])
+        : undefined;
     const amountValue = Number(form.get("receivableAmount") || 0);
     const receivableAmount =
       department === "회계" &&
@@ -434,6 +443,7 @@ export function WorkBoard({ initialItems }: { initialItems: WorkItem[] }) {
           due,
           status,
           priority: "보통",
+          logisticsType,
           receivableAmount,
         },
         ...current,
@@ -463,6 +473,10 @@ export function WorkBoard({ initialItems }: { initialItems: WorkItem[] }) {
       owner: editDraft.owner.trim().slice(0, 40) || "담당자",
       date: getItemDate(editDraft),
       due: formatDateLabel(getItemDate(editDraft)),
+      logisticsType:
+        editDraft.department === "물류"
+          ? editDraft.logisticsType ?? "입고"
+          : undefined,
       receivableAmount:
         editDraft.department === "회계" &&
         Number.isFinite(editDraft.receivableAmount) &&
@@ -614,12 +628,34 @@ export function WorkBoard({ initialItems }: { initialItems: WorkItem[] }) {
                         value={editDraft.receivableAmount ?? ""}
                       />
                     ) : null}
+                    {editDraft.department === "물류" ? (
+                      <select
+                        aria-label="입출고 구분 수정"
+                        className="h-10 w-full rounded-md border border-[#cbdced] bg-white px-3 text-sm font-semibold text-[#315f8f] outline-none focus:border-[#4079b5] focus:ring-2 focus:ring-[#dceafb]"
+                        onChange={(event) =>
+                          updateDraft(
+                            "logisticsType",
+                            event.target.value as WorkItem["logisticsType"],
+                          )
+                        }
+                        value={editDraft.logisticsType ?? "입고"}
+                      >
+                        {logisticsTypes.map((type) => (
+                          <option key={type}>{type}</option>
+                        ))}
+                      </select>
+                    ) : null}
                   </div>
                 ) : (
                   <>
                     <h3 className="mt-2 font-semibold text-[#141914]">
                       {item.title}
                     </h3>
+                    {item.logisticsType ? (
+                      <p className="mt-1 text-sm font-bold text-[#315f8f]">
+                        {item.logisticsType} 업무
+                      </p>
+                    ) : null}
                     {item.receivableAmount ? (
                       <p className="mt-1 text-sm font-bold text-[#b4495f]">
                         미수금 {formatWon(item.receivableAmount)}
@@ -752,7 +788,7 @@ export function WorkBoard({ initialItems }: { initialItems: WorkItem[] }) {
 
       <form
         className={`grid min-w-0 gap-3 rounded-lg border border-[#d9ded4] bg-white p-4 shadow-sm sm:grid-cols-2 lg:grid-cols-3 2xl:gap-2 ${
-          formDepartment === "회계"
+          formDepartment === "회계" || formDepartment === "물류"
             ? "2xl:grid-cols-[minmax(140px,1fr)_85px_85px_125px_85px_110px_72px]"
             : "2xl:grid-cols-[minmax(140px,1fr)_90px_90px_125px_90px_72px]"
         }`}
@@ -824,6 +860,19 @@ export function WorkBoard({ initialItems }: { initialItems: WorkItem[] }) {
               step="1000"
               type="number"
             />
+          </label>
+        ) : null}
+        {formDepartment === "물류" ? (
+          <label className="grid min-w-0 gap-1 text-sm font-semibold text-[#315f8f]">
+            입출고 구분
+            <select
+              className="h-10 w-full rounded-md border border-[#cbdced] bg-white px-3 font-normal text-[#141914] outline-none focus:border-[#4079b5] focus:ring-2 focus:ring-[#dceafb]"
+              name="logisticsType"
+            >
+              {logisticsTypes.map((type) => (
+                <option key={type}>{type}</option>
+              ))}
+            </select>
           </label>
         ) : null}
         <button

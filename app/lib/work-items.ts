@@ -10,6 +10,9 @@ export type Status = (typeof statuses)[number];
 export const priorities = ["긴급", "보통", "낮음"] as const;
 export type Priority = (typeof priorities)[number];
 
+export const logisticsTypes = ["입고", "출고"] as const;
+export type LogisticsType = (typeof logisticsTypes)[number];
+
 export type WorkItem = {
   id: number;
   title: string;
@@ -19,7 +22,20 @@ export type WorkItem = {
   due: string;
   status: Status;
   priority: Priority;
+  logisticsType?: LogisticsType;
   receivableAmount?: number;
+};
+
+export const WORK_ITEMS_STORAGE_KEY = "business-work-hub-items";
+
+export type DashboardMetric = {
+  productionRate: number;
+  productionCompleted: number;
+  productionTotal: number;
+  inboundCount: number;
+  outboundCount: number;
+  receivableAmount: number;
+  receivableCount: number;
 };
 
 export function isDateValue(value: unknown): value is string {
@@ -72,6 +88,16 @@ function normalizeWorkItem(value: unknown): WorkItem | null {
     value.department === "회계" && Number.isFinite(amount) && amount > 0
       ? Math.round(amount)
       : undefined;
+  const logisticsType =
+    value.department === "물류"
+      ? includesValue(logisticsTypes, value.logisticsType)
+        ? value.logisticsType
+        : title.includes("입고")
+          ? "입고"
+          : title.includes("출고")
+            ? "출고"
+            : undefined
+      : undefined;
 
   return {
     id,
@@ -82,6 +108,7 @@ function normalizeWorkItem(value: unknown): WorkItem | null {
     due,
     status: value.status,
     priority: value.priority,
+    ...(logisticsType ? { logisticsType } : {}),
     receivableAmount,
   };
 }
@@ -108,4 +135,57 @@ export function normalizeStoredItems(
   });
 
   return normalized.length > 0 ? normalized : fallback;
+}
+
+export function buildDashboardMetric(
+  items: WorkItem[],
+  today: string,
+): DashboardMetric {
+  const productionItems = items.filter(
+    (item) => item.department === "생산" && item.date === today,
+  );
+  const productionCompleted = productionItems.filter(
+    (item) => item.status === "완료",
+  ).length;
+  const productionTotal = productionItems.length;
+  const productionRate =
+    productionTotal > 0
+      ? Math.round((productionCompleted / productionTotal) * 100)
+      : 0;
+
+  const logisticsItems = items.filter((item) => item.department === "물류");
+  const getLogisticsType = (item: WorkItem) =>
+    item.logisticsType ??
+    (item.title.includes("입고")
+      ? "입고"
+      : item.title.includes("출고")
+        ? "출고"
+        : undefined);
+  const inboundCount = logisticsItems.filter(
+    (item) => getLogisticsType(item) === "입고",
+  ).length;
+  const outboundCount = logisticsItems.filter(
+    (item) => getLogisticsType(item) === "출고",
+  ).length;
+
+  const receivableItems = items.filter(
+    (item) =>
+      item.department === "회계" &&
+      item.status !== "완료" &&
+      Number(item.receivableAmount) > 0,
+  );
+  const receivableAmount = receivableItems.reduce(
+    (sum, item) => sum + Number(item.receivableAmount ?? 0),
+    0,
+  );
+
+  return {
+    productionRate,
+    productionCompleted,
+    productionTotal,
+    inboundCount,
+    outboundCount,
+    receivableAmount,
+    receivableCount: receivableItems.length,
+  };
 }

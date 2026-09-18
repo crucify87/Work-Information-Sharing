@@ -1,40 +1,65 @@
 "use client";
 
 import { Calculator, Factory, Truck } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import {
+  buildDashboardMetric,
+  normalizeStoredItems,
+  WORK_ITEMS_STORAGE_KEY,
+  type WorkItem,
+} from "../lib/work-items";
 
 export const WORKBOARD_DEPARTMENT_EVENT = "workboard:department";
 export const WORKBOARD_ACTIVE_DEPARTMENT_EVENT = "workboard:active-department";
+export const WORKBOARD_ITEMS_EVENT = "workboard:items";
 
-const metrics = [
+function toDateInputValue(date: Date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function formatWon(amount: number) {
+  return `₩${new Intl.NumberFormat("ko-KR").format(amount)}`;
+}
+
+function readSavedItems(fallback: WorkItem[]) {
+  try {
+    const saved = window.localStorage.getItem(WORK_ITEMS_STORAGE_KEY);
+    if (!saved) {
+      return fallback;
+    }
+    return normalizeStoredItems(JSON.parse(saved), fallback);
+  } catch {
+    return fallback;
+  }
+}
+
+const metricMeta = [
   {
     label: "오늘 생산 달성률",
-    value: "0%",
-    detail: "전일 대비 0%",
     department: "생산",
     icon: Factory,
     tone: "emerald",
   },
   {
     label: "입고/출고",
-    value: "0건",
-    detail: "입고 0건 · 출고 0건",
     department: "물류",
     icon: Truck,
     tone: "blue",
   },
   {
     label: "미수 확인",
-    value: "₩0",
-    detail: "0개처 확인 필요",
     department: "회계",
     icon: Calculator,
     tone: "rose",
   },
 ] as const;
 
-export function MetricCards() {
+export function MetricCards({ initialItems }: { initialItems: WorkItem[] }) {
   const [activeDepartment, setActiveDepartment] = useState<string | null>(null);
+  const [items, setItems] = useState(initialItems);
 
   useEffect(() => {
     const handleActiveDepartment = (event: Event) => {
@@ -51,6 +76,53 @@ export function MetricCards() {
         handleActiveDepartment,
       );
   }, []);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      setItems(readSavedItems(initialItems));
+    }, 0);
+
+    const handleItems = (event: Event) => {
+      setItems((event as CustomEvent<WorkItem[]>).detail);
+    };
+
+    window.addEventListener(WORKBOARD_ITEMS_EVENT, handleItems);
+    return () => {
+      window.clearTimeout(timer);
+      window.removeEventListener(WORKBOARD_ITEMS_EVENT, handleItems);
+    };
+  }, [initialItems]);
+
+  const metrics = useMemo(() => {
+    const dashboardMetric = buildDashboardMetric(
+      items,
+      toDateInputValue(new Date()),
+    );
+    const logisticsTotal =
+      dashboardMetric.inboundCount + dashboardMetric.outboundCount;
+
+    return metricMeta.map((metric) => {
+      if (metric.department === "생산") {
+        return {
+          ...metric,
+          value: `${dashboardMetric.productionRate}%`,
+          detail: `완료 ${dashboardMetric.productionCompleted}건 / 전체 ${dashboardMetric.productionTotal}건`,
+        };
+      }
+      if (metric.department === "물류") {
+        return {
+          ...metric,
+          value: `${logisticsTotal}건`,
+          detail: `입고 ${dashboardMetric.inboundCount}건 · 출고 ${dashboardMetric.outboundCount}건`,
+        };
+      }
+      return {
+        ...metric,
+        value: formatWon(dashboardMetric.receivableAmount),
+        detail: `${dashboardMetric.receivableCount}개처 확인 필요`,
+      };
+    });
+  }, [items]);
 
   function openDepartment(department: string) {
     setActiveDepartment(department);
